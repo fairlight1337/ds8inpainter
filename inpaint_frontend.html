@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Inpaint Assistant</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="control-panel">
+        <div id="prompt-container">
+            <textarea id="prompt" placeholder="Enter prompt"></textarea>
+        </div>
+        <div id="sliders-container">
+            <label for="template-select">Template:</label>
+            <select id="template-select" class="control-element">
+            </select>
+            <div class="slider-group">
+                <label for="iteration-slider">Iterations: <span id="iteration-value">50</span></label>
+                <div id="iteration-slider"></div>
+            </div>
+            <div class="slider-group">
+                <label for="stroke-size-slider">Stroke Size: <span id="stroke-size-value">5px</span></label>
+                <div id="stroke-size-slider"></div>
+            </div>
+            <input type="file" id="load-image-btn" class="control-element" accept="image/*">
+            <button id="generate-btn" class="control-element">Generate</button>
+        </div>
+        <div id="progress-container">
+            <svg id="progress-circle" width="250" height="250" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="80" stroke="#ADD8E6" stroke-width="10" fill="none" />
+                <path id="progress-path" stroke="#00008B" stroke-width="10" fill="none" />
+                <text id="progress-text" x="100" y="110" text-anchor="middle" fill="black" font-size="20" font-weight="bold">0%</text>
+            </svg>
+        </div>
+    </div>
+    <div id="content-area">
+        <div class="image-container" id="loaded-image">
+            <div id="loaded-image-data">
+                <div id="selection-rectangle"></div>
+            </div>
+        </div>
+        <div class="image-section">
+            <div class="image-container" id="mask-section">
+                <img id="mask-image" src="" alt="Mask section">
+                <canvas id="maskCanvas"></canvas>
+                <div id="brush-indicator"></div>
+            </div>
+            <button id="clear-mask-btn" class="control-element">Clear Mask</button>
+        </div>
+        <div class="result-section">
+            <div class="image-container" id="generated-image"></div>
+            <button id="copy-to-source-btn" class="control-element">Copy to Source</button>
+            <button id="download-btn" class="control-element">Download</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

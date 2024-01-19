@@ -1,0 +1,195 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #D0F0C0; /* Light green background */
+    color: #333;
+}
+
+#control-panel {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+#prompt-container {
+    flex-grow: 2;
+    margin-right: 20px;
+}
+
+#sliders-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.slider-group {
+    width: 200px; /* Adjust as needed */
+    margin-bottom: 15px;
+}
+
+#generate-btn {
+    width: 200px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #4CAF50; /* Green button */
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#content-area {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.image-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 512px;
+    height: 512px;
+    background-color: white;
+}
+
+#prompt-container {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+#prompt {
+    flex-grow: 1;
+    resize: none; /* Disable resizing */
+}
+
+.control-element {
+    width: 200px;
+    margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#load-image-btn {
+    cursor: pointer;
+}
+
+#loaded-image {
+    position: relative;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: hidden; /* Prevents the rectangle from moving outside */
+}
+
+#loaded-image-data {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#selection-rectangle {
+    position: absolute;
+    border: 2px solid grey;
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent */
+    cursor: move;
+    width: 512px;
+    height: 512px;
+}
+
+#mask-section {
+    overflow: hidden; /* Clip the image based on the container */
+    position: relative;
+}
+
+#maskCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: crosshair; /* Change cursor to indicate drawing */
+}
+
+#mask-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#mask-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent overlay */
+}
+
+.image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 512px; /* Match the width of the image container */
+}
+
+.result-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 512px; /* Match the width of the image container */
+}
+
+#clear-mask-btn {
+    width: 200px; /* Match the width of the Generate button */
+    margin-top: 10px; /* Add spacing above the button */
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#download-btn {
+    width: 200px; /* Match the width of the Generate button */
+    margin-top: 10px; /* Add spacing above the button */
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#copy-to-source-btn {
+    width: 200px; /* Match the width of the Generate button */
+    margin-top: 10px; /* Add spacing above the button */
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#generated-image {
+    display: flex;
+    align-items: center; /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 512px;
+    height: 512px;
+    background-color: white;
+    overflow: hidden; /* Ensures the image doesn't spill outside the div */
+}
+
+#brush-indicator {
+    position: absolute;
+    border: 1px solid black; /* Black circle contour */
+    border-radius: 50%; /* Circular shape */
+    pointer-events: none; /* Prevents the indicator from blocking canvas events */
+    display: none; /* Initially hidden */
+}
