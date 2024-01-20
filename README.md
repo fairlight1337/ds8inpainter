@@ -43,4 +43,6 @@ Dreamshaper v8 requires some 2-3GB VRAM and a CUDA capable GPU. If you have a fa
 
 ## Opens and Todos
 
-* Write an Opens and Todos section.
+* Image quality gets reduced slightly when copying over the result to the source image. Not sure yet why, needs to be investigated.
+* Allocated image objects in the frontend JS need to be freed properly (right now it's a bit messy).
+* When loading a new image after working with a previous one, image artifacts of the previous image might stick around. This needs to get cleaned up properly upon image load.
