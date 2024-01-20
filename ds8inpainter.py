@@ -123,8 +123,12 @@ def serve_img():
             callback_steps=1
         ).images[0]
 
-        # Combine the original and generated images based on the mask
-        final_image = Image.composite(generated_image, img_orig, img_mask_bw)
+        # Convert mask to a format suitable for compositing (mode "1" is binary: black or white)
+        # White areas (255) are the parts to keep from the generated image
+        mask_for_composite = img_mask_bw.point(lambda x: 255 if x else 0, '1')
+
+        # Apply the generated content onto the original image using the mask
+        final_image = Image.composite(generated_image, img_orig, mask_for_composite)
 
         # Generate a hash for the final image
         image_hash = hash_image(final_image)
