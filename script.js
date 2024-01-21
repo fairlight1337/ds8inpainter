@@ -10,6 +10,7 @@ $(function() {
     const loadedImage = $('#loaded-image');
     const loadedImageData = $('#loaded-image-data');
     let imageObj = null;
+    let blending_radius = 2
 
     var socket = io('http://127.0.0.1:9199');
 
@@ -249,6 +250,17 @@ $(function() {
         }
     });
 
+    // Slider for the blending radius
+    $("#blending-radius-slider").slider({
+        value: blending_radius,
+        min: 0,
+        max: 10,
+        slide: function(event, ui) {
+            $("#blending-radius-value").text(ui.value + 'px');
+            blending_radius = ui.value;
+        }
+    });
+
     // Function to update the mask section based on the selection rectangle
     function updateMaskSection() {
         if (!imageObj) return;
@@ -391,56 +403,60 @@ $(function() {
             formData.append('mask_data', maskData);
             formData.append('text', finalPrompt);
             formData.append('iterations', $('#iteration-value').text());
+            formData.append('blending_radius', blending_radius)
+            formData.append('apply_blending', blending_radius > 0)
         
             fetch('/generate', { method: 'POST', body: formData })
                 .then(response => response.blob())
                 .then(blob => {
                     var objectURL = URL.createObjectURL(blob);
-                    overlayGeneratedImage(objectURL);
+                    overlayGeneratedImage(objectURL, false);
                 });
         }
     });
     
     // Function to overlay the generated image onto the original image
-    function overlayGeneratedImage(generatedImageUrl) {
+    function overlayGeneratedImage(generatedImageUrl, replaceWholeSection = false) {
         const selectionRect = $('#selection-rectangle');
         const loadedImageData = $('#loaded-image-data');
         const generatedImageDiv = $('#generated-image');
         const originalImage = $('#mask-image')[0]; // Original image element
-
+    
         // Load the generated image
         const generatedImage = new Image();
         generatedImage.src = generatedImageUrl;
         generatedImage.onload = function() {
-            // Create a canvas to draw the final image at original resolution
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = originalImage.naturalWidth;
             canvas.height = originalImage.naturalHeight;
-
+    
             // Draw the original image on the canvas
             ctx.drawImage(originalImage, 0, 0);
-
-            // Calculate selection rectangle coordinates relative to the original image
-            const rectX = selectionRect.position().left / loadedImageData.width() * originalImage.naturalWidth;
-            const rectY = selectionRect.position().top / loadedImageData.height() * originalImage.naturalHeight;
-            const rectWidth = selectionRect.width() / loadedImageData.width() * originalImage.naturalWidth;
-            const rectHeight = selectionRect.height() / loadedImageData.height() * originalImage.naturalHeight;
-
-            // Scale the generated image to fit the selection area on the original image
-            ctx.drawImage(generatedImage, 0, 0, generatedImage.width, generatedImage.height, rectX, rectY, rectWidth, rectHeight);
-
+    
+            if (replaceWholeSection) {
+                // Replace the entire section specified by the selection rectangle with the generated image
+                const rectX = selectionRect.position().left / loadedImageData.width() * originalImage.naturalWidth;
+                const rectY = selectionRect.position().top / loadedImageData.height() * originalImage.naturalHeight;
+                ctx.drawImage(generatedImage, rectX, rectY);
+            } else {
+                // Overlay the generated image on the original image within the selection rectangle
+                const rectX = selectionRect.position().left / loadedImageData.width() * originalImage.naturalWidth;
+                const rectY = selectionRect.position().top / loadedImageData.height() * originalImage.naturalHeight;
+                const rectWidth = selectionRect.width() / loadedImageData.width() * originalImage.naturalWidth;
+                const rectHeight = selectionRect.height() / loadedImageData.height() * originalImage.naturalHeight;
+                ctx.drawImage(generatedImage, 0, 0, generatedImage.width, generatedImage.height, rectX, rectY, rectWidth, rectHeight);
+            }
+    
             // Convert canvas to image URL for display
             const finalImageUrl = canvas.toDataURL("image/png");
-            // Display the final image with retained aspect ratio
-            let imageStyle = 'max-width: 100%; max-height: 100%; object-fit: contain;'; // Default style to retain aspect ratio
+            let imageStyle = 'max-width: 100%; max-height: 100%; object-fit: contain;';
             generatedImageDiv.html('<img src="' + finalImageUrl + '" alt="Final Image" style="' + imageStyle + '">');
-
-
+    
             // Store the full-resolution image for download
             $('#download-btn').data('downloadUrl', finalImageUrl);
         };
-    }
+    }    
 
     // Download button
     $("#download-btn").click(function() {

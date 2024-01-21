@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 import hashlib
 import base64
-from PIL import Image
+from PIL import Image, ImageFilter
 import io
 
 from diffusers import AutoPipelineForInpainting, DEISMultistepScheduler
@@ -79,6 +79,14 @@ def progress(step, timestep, latents):
     global iterations
     socketio.emit('progress', (step / iterations) * 100)
 
+def blend_edges(image, original_image, mask, radius):
+    # Convert the mask to grayscale for blurring
+    grayscale_mask = mask.convert('L')
+    blurred_mask = grayscale_mask.filter(ImageFilter.GaussianBlur(radius))
+
+    # Composite the images using the blurred mask
+    return Image.composite(image, original_image, blurred_mask)
+
 @app.route('/generate/', methods=['GET', 'POST'])
 @cross_origin()
 def serve_img():
@@ -87,6 +95,10 @@ def serve_img():
         text = request.form.get('text')
         global iterations
         iterations = int(request.form.get('iterations'))
+
+        # Additional flag to determine if blending should be applied
+        apply_blending = request.form.get('apply_blending', 'false').lower() == 'true'
+        blending_radius = int(request.form.get('blending_radius', 5))
 
         # Decode the selected portion of the original image
         orig_img_data = request.form.get('original_image_data')
@@ -123,12 +135,15 @@ def serve_img():
             callback_steps=1
         ).images[0]
 
-        # Convert mask to a format suitable for compositing (mode "1" is binary: black or white)
-        # White areas (255) are the parts to keep from the generated image
+        # Convert mask to a format suitable for compositing
         mask_for_composite = img_mask_bw.point(lambda x: 255 if x else 0, '1')
 
-        # Apply the generated content onto the original image using the mask
-        final_image = Image.composite(generated_image, img_orig, mask_for_composite)
+        if apply_blending:
+            # Apply blending if the flag is set
+            final_image = blend_edges(generated_image, img_orig, img_mask_bw, blending_radius)
+        else:
+            # Apply the generated content onto the original image using the mask
+            final_image = Image.composite(generated_image, img_orig, mask_for_composite)
 
         # Generate a hash for the final image
         image_hash = hash_image(final_image)
